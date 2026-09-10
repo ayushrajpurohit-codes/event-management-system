@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit User - Event Management System</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f5f7fb;
+            color: #1f2937;
+        }
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 230px;
+            height: 100vh;
+            background: #111827;
+            padding: 25px 15px;
+        }
+
+        .sidebar h2 {
+            color: white;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .sidebar a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: #d1d5db;
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 6px;
+        }
+
+        .sidebar a:hover,
+        .sidebar a.active {
+            background: #2563eb;
+            color: white;
+        }
+
+        .sidebar-icon {
+            width: 22px;
+            text-align: center;
+        }
+
+        .main {
+            margin-left: 230px;
+            padding: 30px;
+        }
+
+        .topbar {
+            margin-bottom: 25px;
+        }
+
+        .topbar h1 {
+            font-size: 28px;
+            margin-bottom: 6px;
+        }
+
+        .topbar p {
+            color: #6b7280;
+        }
+
+        .form-box {
+            background: white;
+            max-width: 700px;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 7px;
+            font-size: 15px;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #2563eb;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 25px;
+        }
+
+        button,
+        .back-btn {
+            padding: 11px 18px;
+            border-radius: 7px;
+            border: none;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        button {
+            background: #2563eb;
+            color: white;
+        }
+
+        button:hover {
+            background: #1d4ed8;
+        }
+
+        .back-btn {
+            background: #e5e7eb;
+            color: #374151;
+        }
+
+        .back-btn:hover {
+            background: #d1d5db;
+        }
+
+        .error {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 12px;
+            border-radius: 7px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="sidebar">
+
+    <h2>Event Management</h2>
+
+    <a href="{% url 'dashboard' %}">
+        <span class="sidebar-icon">🏠</span>
+        Dashboard
+    </a>
+
+    <a href="{% url 'booking_list' %}">
+        <span class="sidebar-icon">📋</span>
+        Bookings
+    </a>
+
+    <a href="{% url 'event_list' %}">
+        <span class="sidebar-icon">📅</span>
+        Events
+    </a>
+
+    <a href="{% url 'event_type_list' %}">
+        <span class="sidebar-icon">🎪</span>
+        Event Types
+    </a>
+
+    <a href="{% url 'service_list' %}">
+        <span class="sidebar-icon">🛠️</span>
+        Services
+    </a>
+
+    <a href="{% url 'booking_report' %}">
+        <span class="sidebar-icon">📊</span>
+        Reports
+    </a>
+
+    <a href="{% url 'user_list' %}" class="active">
+        <span class="sidebar-icon">👥</span>
+        Users
+    </a>
+
+    <a href="#">
+        <span class="sidebar-icon">⚙️</span>
+        Settings
+    </a>
+
+    <a href="{% url 'logout' %}">
+        <span class="sidebar-icon">🚪</span>
+        Logout
+    </a>
+
+</div>
+
+<div class="main">
+
+    <div class="topbar">
+        <h1>Edit User</h1>
+        <p>Update user information</p>
+    </div>
+
+    <div class="form-box">
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="error">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label>Username</label>
+
+                <input
+                    type="text"
+                    name="username"
+                    value="{{ user.username }}"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label>Email</label>
+
+                <input
+                    type="email"
+                    name="email"
+                    value="{{ user.email }}"
+                >
+            </div>
+
+            <div class="form-group">
+                <label>New Password</label>
+
+                <input
+                    type="password"
+                    name="password"
+                    placeholder="Leave blank to keep current password"
+                >
+            </div>
+
+            <div class="buttons">
+
+                <button type="submit">
+                    Update User
+                </button>
+
+                <a
+                    href="{% url 'user_list' %}"
+                    class="back-btn"
+                >
+                    Cancel
+                </a>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Invoice - Event Management System</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f3f4f6;
+            color: #111827;
+            padding: 30px;
+        }
+
+        .invoice-wrapper {
+            max-width: 900px;
+            margin: auto;
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+
+        .invoice-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: 2px solid #111827;
+            padding-bottom: 25px;
+            margin-bottom: 30px;
+        }
+
+        .company h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .company p {
+            color: #6b7280;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .invoice-title {
+            text-align: right;
+        }
+
+        .invoice-title h2 {
+            font-size: 30px;
+            margin-bottom: 8px;
+        }
+
+        .invoice-title p {
+            font-size: 13px;
+            color: #6b7280;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 15px;
+            font-weight: bold;
+            margin-bottom: 12px;
+            color: #374151;
+        }
+
+        .customer-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px 40px;
+        }
+
+        .info-item {
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .info-item strong {
+            display: inline-block;
+            min-width: 110px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th {
+            background: #111827;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-size: 13px;
+        }
+
+        td {
+            padding: 14px 12px;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 13px;
+        }
+
+        .amount {
+            text-align: right;
+        }
+
+        .total-section {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 25px;
+        }
+
+        .total-box {
+            width: 300px;
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            font-size: 14px;
+        }
+
+        .grand-total {
+            border-top: 2px solid #111827;
+            margin-top: 5px;
+            padding-top: 15px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .approved {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .cancelled {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .notes {
+            background: #f9fafb;
+            padding: 15px;
+            border-radius: 7px;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .footer {
+            border-top: 1px solid #e5e7eb;
+            margin-top: 35px;
+            padding-top: 20px;
+            text-align: center;
+            color: #6b7280;
+            font-size: 12px;
+        }
+
+        .actions {
+            max-width: 900px;
+            margin: 20px auto 0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .btn {
+            border: none;
+            padding: 10px 18px;
+            border-radius: 7px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 13px;
+        }
+
+        .print-btn {
+            background: #111827;
+            color: white;
+        }
+
+        .back-btn {
+            background: #e5e7eb;
+            color: #111827;
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+
+            .invoice-wrapper {
+                box-shadow: none;
+                border-radius: 0;
+                max-width: 100%;
+            }
+
+            .actions {
+                display: none;
+            }
+        }
+
+        @media (max-width: 700px) {
+            body {
+                padding: 10px;
+            }
+
+            .invoice-wrapper {
+                padding: 20px;
+            }
+
+            .invoice-header {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .invoice-title {
+                text-align: left;
+            }
+
+            .customer-info {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="invoice-wrapper">
+
+    <div class="invoice-header">
+
+        <div class="company">
+            <h1>Event Management</h1>
+            <p>
+                Professional Event Management Services<br>
+                Email: info@eventmanagement.com<br>
+                Phone: +91 XXXXX XXXXX
+            </p>
+        </div>
+
+        <div class="invoice-title">
+            <h2>INVOICE</h2>
+
+            <p>
+                Invoice #: INV-{{ booking.id|stringformat:"05d" }}
+            </p>
+
+            <p>
+                Date: {{ booking.created_at|date:"d M Y" }}
+            </p>
+        </div>
+
+    </div>
+
+
+    <!-- Customer Information -->
+
+    <div class="section">
+
+        <div class="section-title">
+            BILL TO
+        </div>
+
+        <div class="customer-info">
+
+            <div class="info-item">
+                <strong>Name:</strong>
+                {{ booking.customer_name }}
+            </div>
+
+            <div class="info-item">
+                <strong>Email:</strong>
+                {{ booking.customer_email }}
+            </div>
+
+            <div class="info-item">
+                <strong>Phone:</strong>
+                {{ booking.customer_phone }}
+            </div>
+
+            <div class="info-item">
+                <strong>Status:</strong>
+
+                <span class="status
+                    {% if booking.status == 'Approved' %}
+                        approved
+                    {% elif booking.status == 'Cancelled' %}
+                        cancelled
+                    {% else %}
+                        pending
+                    {% endif %}
+                ">
+                    {{ booking.status }}
+                </span>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Event Details -->
+
+    <div class="section">
+
+        <div class="section-title">
+            EVENT DETAILS
+        </div>
+
+        <div class="customer-info">
+
+            <div class="info-item">
+                <strong>Event:</strong>
+                {{ booking.event.name }}
+            </div>
+
+            <div class="info-item">
+                <strong>Event Type:</strong>
+                {{ booking.event.event_type.name }}
+            </div>
+
+            <div class="info-item">
+                <strong>Date:</strong>
+                {{ booking.booking_date|date:"d M Y" }}
+            </div>
+
+            <div class="info-item">
+                <strong>Venue:</strong>
+                {{ booking.venue }}
+            </div>
+
+            <div class="info-item">
+                <strong>Guests:</strong>
+                {{ booking.guests }}
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Service & Amount -->
+
+    <div class="section">
+
+        <div class="section-title">
+            SERVICE DETAILS
+        </div>
+
+        <table>
+
+            <thead>
+                <tr>
+                    <th>Description</th>
+                    <th>Guests</th>
+                    <th class="amount">Amount</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                <tr>
+                    <td>
+                        {% if booking.service %}
+                            {{ booking.service.name }}
+                        {% else %}
+                            Event Management Service
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        {{ booking.guests }}
+                    </td>
+
+                    <td class="amount">
+                        ₹{{ booking.amount }}
+                    </td>
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+    <!-- Total -->
+
+    <div class="total-section">
+
+        <div class="total-box">
+
+            <div class="total-row">
+                <span>Subtotal</span>
+                <span>₹{{ booking.amount }}</span>
+            </div>
+
+            <div class="total-row grand-total">
+                <span>Total</span>
+                <span>₹{{ booking.amount }}</span>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    {% if booking.notes %}
+
+    <div class="section">
+
+        <div class="section-title">
+            NOTES
+        </div>
+
+        <div class="notes">
+            {{ booking.notes }}
+        </div>
+
+    </div>
+
+    {% endif %}
+
+
+    <div class="footer">
+        Thank you for choosing our Event Management Services.<br>
+        This is a computer-generated invoice.
+    </div>
+
+</div>
+
+
+<div class="actions">
+
+    <a href="{% url 'booking_detail' booking.id %}" class="btn back-btn">
+        ← Back
+    </a>
+
+    <button onclick="window.print()" class="btn print-btn">
+        🖨️ Print / Save PDF
+    </button>
+
+</div>
+
+</body>
+</html>
